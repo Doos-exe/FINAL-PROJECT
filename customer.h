@@ -1,25 +1,21 @@
-#define MAX_SIZE 100
+#include <string>
+#include <queue>
 
-class Customer {
+using namespace std;
+
+struct Customer{
+    int customerID;
+    string name;
+    string address;
+};
+
+class CustomerADT{
 private:
-    int front, rear, size;
-    int arr[MAX_SIZE];
+    queue<Customer> customers;
+    int nextCustomerID = 1;
 
 public:
-    Queue() {
-		front = rear = -1;
-		size = 0;
-	}
-    bool isEmpty();
-    bool isFull();
-    void enqueue(int x);
-    int dequeue();
-    int getSize();
-    void displayQueue();
-    int getFront();
-    
-    void AddCustomer();
-    void CustomerDetails();
-    void CustomerList();
+    void AddCustomer(const string& name, const string& address);
+    void CustomerDetails(int customerID);
 };
 
