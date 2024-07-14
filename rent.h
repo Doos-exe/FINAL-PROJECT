@@ -1,20 +1,21 @@
 #include <string>
 #include <stack>
+#include <map>
 
 using namespace std;
 
-class Rent
-{
+class RentADT{
 	private:
-		stack<string> movie;
+		struct Rent {
+        	int customerID;
+        	stack<int> rentedVideoIDs;
+    	};
+    	
+    	map<int, Rent> customerRentals;
 	public:
-		void push(char m);
-		void pop();
-		char top();
-		int pushpop(string movie);
-		bool empty();
+		void RentVideo(int customerID, int videoID);
+		void ReturnVideo(int customerID, int videoID);
+		void printRentedVideos(int customerID);
 		
-		void NewVideo();
-		void RentVideo();
-		void ReturnVideo();
+		//void NewVideo();
 };
