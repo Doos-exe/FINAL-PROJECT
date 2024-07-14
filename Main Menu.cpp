@@ -1,7 +1,17 @@
+#include "customer.h"
+#include "rent.h"
 #include <iostream>
+#include <string>
+#include <limits>
+#include <windows.h>
+
 using namespace std;
 
 int main(){
+	CustomerADT customerADT;
+    RentADT rentADT;
+    string name, address;
+    int customerID;
 	char opt;
 	int opta;
 	
@@ -25,31 +35,31 @@ int main(){
 	
 			switch(opta){
 				case 1:
-					1
+					//1
 					cout<<"\n1";
 					break;
 				case 2:
-					2
+					//2
 					cout<<"\n2";
 					break;
 				case 3:
-					3
+					//3
 					cout<<"\n3";
 					break;
 				case 4:
-					4
+					//4
 					cout<<"\n4";
 					break;
 				case 5:
-					5
+					//5
 					cout<<"\n5";
 					break;
 				case 6:
-					6
+					//6
 					cout<<"\n6";
 					break;
 				case 7:
-					7
+					//7
 					cin.clear();
 					cout<<"[1] Add New Customer"<<endl;
 					cout<<"[2] Show Customer Details"<<endl;
@@ -61,35 +71,45 @@ int main(){
 					//For the options of Customer Maintenance
 					switch(opta){
 						case 1:
-							7.1
-							cout<<"\n7.1";
+							cin.ignore();
+							
+							system("cls");
+                					cout << "Enter Name: ";
+                					getline(cin ,name);
+                					cout << "Enter Address: ";
+                					getline(cin ,address);
+                					customerADT.AddCustomer(name, address);
 							break;
 						case 2:
-							7.2
-							cout<<"\n7.2";
+                					cout << "Enter Customer ID: ";
+                					cin >> customerID;
+                					cin.clear();
+                					cin.ignore(numeric_limits<streamsize>::max(), '\n');
+                					customerADT.CustomerDetails(customerID);
 							break;
 						case 3:
-							cout<<"\n7.3";
-							7.3
+                					cout << "Enter Customer ID: ";
+                					cin >> customerID;
+                					rentADT.printRentedVideos(customerID);
 							break;
 						default:
-							cin.ignore();
-							cout<<"That is not an option \nPlease press enter to try again..."<<endl;
-							cin.get();
+							Sleep(500);
+							cout<<"That is not an option"<<endl;
 							opta = 0;
+							system("pause");
 							system("cls");
 							break;
 					}	
 					break;
 				case 8:
-					8
+					//8
 					cout<<"Thank you for using our program! <3";
 					return 0;
 					break;
 				default:
-					cin.ignore();
-					cout<<"That is not an option \nPlease press enter to try again..."<<endl;
-					cin.get();
+					Sleep(500);
+					cout<<"That is not an option"<<endl;
+					system("pause");
 					opta = 0;
 					system("cls");
 					break;
@@ -99,7 +119,7 @@ int main(){
 		
 		////Loop for the option to run it again
 		do{
-			cout<<endl<<"Do you want to try again? ";
+			cout<<endl<<"Do you want to go back to the Main Menu: ";
 			cin>>opt;
 			
 			switch(opt){
@@ -111,9 +131,9 @@ int main(){
 			case 'n':
 				break;
 			default:
-				cin.ignore();
-				cout<<"That is not an option \nPlease press enter to try again..."<<endl;
-				cin.get();
+				Sleep(500);
+				cout<<"That is not an option"<<endl;
+				system("pause");
 				system("cls");
 				opt = 'a';
 				break;	
