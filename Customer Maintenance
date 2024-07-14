@@ -1,0 +1,187 @@
+#include <iostream>
+#include <queue>
+#include <stack>
+#include <map>
+#include <fstream>
+#include <string>
+#include <vector>
+#include <stdlib.h>
+#include <limits>
+#include <windows.h>
+using namespace std;
+
+struct Customer { // Customer information
+    int customerID;
+    string name;
+    string address;
+};
+
+class CustomerADT {
+private:
+    queue<Customer> customers;
+    int nextCustomerID = 1;
+
+public:
+    void addCustomer(const string& name, const string& address) {
+        Customer newCustomer = {nextCustomerID++, name, address};
+        customers.push(newCustomer);
+        system("cls");
+        cout << "Customer added successfully!\n";
+        cout << "Customer ID: " << newCustomer.customerID << endl;
+        cout << "Name       : " << newCustomer.name << endl;
+        cout << "Address    : " << newCustomer.address << '\n' << endl;
+    }
+
+    void showCustomerDetails(int customerID) {
+        queue<Customer> tempQueue = customers;
+        bool found = false;
+
+        while (!tempQueue.empty()) {
+            Customer current = tempQueue.front();
+            tempQueue.pop();
+            if (current.customerID == customerID) {
+                system("cls");
+                cout << "Customer Details\n";
+                cout << "Customer ID: " << current.customerID << "\n";
+                cout << "Name: " << current.name << "\n";
+                cout << "Address: " << current.address << "\n";
+                system("pause");
+                cout << "\n";
+                found = true;
+                break;
+            }
+        }
+
+        if (!found) {
+            system("cls");
+            cout << "\nCustomer not found!\n\n";
+            Sleep(500);
+        }
+    }
+
+    void printAllCustomers() {
+        queue<Customer> tempQueue = customers;
+        while (!tempQueue.empty()) {
+            Customer current = tempQueue.front();
+            tempQueue.pop();
+            cout << "Customer ID: " << current.customerID << "\n";
+            cout << "Name: " << current.name << "\n";
+            cout << "Address: " << current.address << "\n";
+        }
+    }
+};
+
+class CustomerRentADT { // Renting Movies
+private:
+    struct Rent {
+        int customerID;
+        stack<int> rentedVideoIDs;
+    };
+    map<int, Rent> customerRentals;
+
+public:
+    void rentVideo(int customerID, int videoID) {
+        customerRentals[customerID].customerID = customerID;
+        customerRentals[customerID].rentedVideoIDs.push(videoID);
+        cout << "Video rented successfully!\n";
+    }
+
+    void returnVideo(int customerID, int videoID) {
+        if (customerRentals.find(customerID) != customerRentals.end()) {
+            stack<int> tempStack;
+            while (!customerRentals[customerID].rentedVideoIDs.empty()) {
+                int top = customerRentals[customerID].rentedVideoIDs.top();
+                customerRentals[customerID].rentedVideoIDs.pop();
+                if (top != videoID) {
+                    tempStack.push(top);
+                }
+            }
+            while (!tempStack.empty()) {
+                customerRentals[customerID].rentedVideoIDs.push(tempStack.top());
+                tempStack.pop();
+            }
+            cout << "Video returned successfully!\n";
+        } else {
+            cout << "Customer not found!\n";
+        }
+    }
+
+    void printRentedVideos(int customerID) {
+        if (customerRentals.find(customerID) != customerRentals.end()) {
+            stack<int> tempStack = customerRentals[customerID].rentedVideoIDs;
+            cout << "List of Videos Rented by Customer ID: " << customerID << "\n";
+            while (!tempStack.empty()) {
+                cout << "Video ID: " << tempStack.top() << "\n";
+                tempStack.pop();
+            }
+        } else {
+            cout << "Customer not found!\n";
+        }
+    }
+};
+
+void saveCustomersToFile(const CustomerADT& customerADT) {
+    // Implement saving customers to a file
+}
+
+void saveRentalsToFile(const CustomerRentADT& customerRentADT) {
+    // Implement saving rentals to a file
+}
+
+int main() {
+    CustomerADT customerADT;
+    CustomerRentADT customerRentADT;
+    int choice;
+
+    do {
+        cout << "CUSTOMER MAINTENANCE\n";
+        cout << "[1] Add New Customer\n";
+        cout << "[2] Show Customer Details\n";
+        cout << "[3] List of Videos Rented by a Customer\n";
+        // cout << "[8] Exit Program\n";
+        cout << "Enter Choice: ";
+        cin >> choice;
+        cin.clear();
+        cin.ignore(numeric_limits<streamsize>::max(), '\n');
+        
+        switch (choice) {
+            case 1: {
+                string name, address;
+                cout << "Enter Name: ";
+                getline(cin ,name);
+                cout << "Enter Address: ";
+                getline(cin ,address);
+                customerADT.addCustomer(name, address);
+                break;
+            }
+            case 2: {
+                int customerID;
+                cout << "Enter Customer ID: ";
+                cin >> customerID;
+                cin.clear();
+                cin.ignore(numeric_limits<streamsize>::max(), '\n');
+                customerADT.showCustomerDetails(customerID);
+                break;
+            }
+            case 3: {
+                int customerID;
+                cout << "Enter Customer ID: ";
+                cin >> customerID;
+                customerRentADT.printRentedVideos(customerID);
+                break;
+            }
+            // case 8: { Wala pa to
+            //     saveCustomersToFile(customerADT);
+            //     saveRentalsToFile(customerRentADT);
+            //     cout << "Data saved. Exiting program.\n";
+            //     break;
+            // }
+            default:
+                system("cls");
+                cout << "\nInvalid choice, try again.\n\n";
+                Sleep(500);
+        }
+    } while (choice != 8);
+
+    return 0;
+}
