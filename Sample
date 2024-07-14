@@ -1,0 +1,360 @@
+#include <iostream>
+#include <fstream>
+#include <string>
+#include <list>
+#include <algorithm>
+
+using namespace std;
+
+class Video {
+public:
+    int videoID;
+    string title;
+    string genre;
+    string production;
+    int numCopies;
+    string imageFilename;
+
+    Video(int id, const string& title, const string& genre, const string& production, int copies, const string& filename)
+        : videoID(id), title(title), genre(genre), production(production), numCopies(copies), imageFilename(filename) {}
+
+    void showDetails() const {
+        cout << "Video ID: " << videoID << endl;
+        cout << "Title: " << title << endl;
+        cout << "Genre: " << genre << endl;
+        cout << "Production: " << production << endl;
+        cout << "Number of Copies: " << numCopies << endl;
+        cout << "Image Filename: " << imageFilename << endl;
+    }
+};
+
+class Customer {
+public:
+    int customerID;
+    string name;
+    string address;
+
+    Customer(int id, const string& name, const string& address)
+        : customerID(id), name(name), address(address) {}
+
+    void showDetails() const {
+        cout << "Customer ID: " << customerID << endl;
+        cout << "Name: " << name << endl;
+        cout << "Address: " << address << endl;
+    }
+};
+
+class CustomerRent {
+public:
+    int customerID;
+    list<int> rentedVideos;
+
+    CustomerRent(int id) : customerID(id) {}
+
+    void rentVideo(int videoID) {
+        rentedVideos.push_back(videoID);
+    }
+
+    void returnVideo(int videoID) {
+        rentedVideos.remove(videoID);
+    }
+
+    void showRentedVideos() const {
+        cout << "Customer ID: " << customerID << endl;
+        cout << "Rented Videos: ";
+        for (int videoID : rentedVideos) {
+            cout << videoID << " ";
+        }
+        cout << endl;
+    }
+};
+
+class VideoStore {
+private:
+    list<Video> videos;
+    list<Customer> customers;
+    list<CustomerRent> customerRents;
+    int nextVideoID;
+    int nextCustomerID;
+
+public:
+    VideoStore() : nextVideoID(1), nextCustomerID(1) {
+        loadVideos();
+        loadCustomers();
+        loadCustomerRents();
+    }
+
+    ~VideoStore() {
+        saveVideos();
+        saveCustomers();
+        saveCustomerRents();
+    }
+
+    void addVideo(const string& title, const string& genre, const string& production, int copies, const string& filename) {
+        videos.emplace_back(nextVideoID++, title, genre, production, copies, filename);
+    }
+
+    void rentVideo(int customerID, int videoID) {
+        auto customerRent = find_if(customerRents.begin(), customerRents.end(), [customerID](const CustomerRent& cr) { return cr.customerID == customerID; });
+        if (customerRent != customerRents.end()) {
+            customerRent->rentVideo(videoID);
+        } else {
+            CustomerRent newRent(customerID);
+            newRent.rentVideo(videoID);
+            customerRents.push_back(newRent);
+        }
+    }
+
+    void returnVideo(int customerID, int videoID) {
+        auto customerRent = find_if(customerRents.begin(), customerRents.end(), [customerID](const CustomerRent& cr) { return cr.customerID == customerID; });
+        if (customerRent != customerRents.end()) {
+            customerRent->returnVideo(videoID);
+        }
+    }
+
+    void showVideoDetails(int videoID) const {
+        auto video = find_if(videos.begin(), videos.end(), [videoID](const Video& v) { return v.videoID == videoID; });
+        if (video != videos.end()) {
+            video->showDetails();
+        } else {
+            cout << "Video not found." << endl;
+        }
+    }
+
+    void displayAllVideos() const {
+        for (const Video& video : videos) {
+            video.showDetails();
+            cout << "---------------------" << endl;
+        }
+    }
+
+    void addCustomer(const string& name, const string& address) {
+        customers.emplace_back(nextCustomerID++, name, address);
+    }
+
+    void showCustomerDetails(int customerID) const {
+        auto customer = find_if(customers.begin(), customers.end(), [customerID](const Customer& c) { return c.customerID == customerID; });
+        if (customer != customers.end()) {
+            customer->showDetails();
+        } else {
+            cout << "Customer not found." << endl;
+        }
+    }
+
+    void listVideosRentedByCustomer(int customerID) const {
+        auto customerRent = find_if(customerRents.begin(), customerRents.end(), [customerID](const CustomerRent& cr) { return cr.customerID == customerID; });
+        if (customerRent != customerRents.end()) {
+            customerRent->showRentedVideos();
+        } else {
+            cout << "No videos rented by this customer." << endl;
+        }
+    }
+
+    void checkVideoAvailability(int videoID) const {
+        auto video = find_if(videos.begin(), videos.end(), [videoID](const Video& v) { return v.videoID == videoID; });
+        if (video != videos.end()) {
+            if (video->numCopies > 0) {
+                cout << "Video is available." << endl;
+            } else {
+                cout << "Video is not available." << endl;
+            }
+        } else {
+            cout << "Video not found." << endl;
+        }
+    }
+
+private:
+    void loadVideos() {
+        ifstream infile("videos.txt");
+        if (infile.is_open()) {
+            int id, copies;
+            string title, genre, production, filename;
+            while (infile >> id >> title >> genre >> production >> copies >> filename) {
+                videos.emplace_back(id, title, genre, production, copies, filename);
+            }
+            infile.close();
+        }
+    }
+
+    void saveVideos() const {
+        ofstream outfile("videos.txt");
+        if (outfile.is_open()) {
+            for (const Video& video : videos) {
+                outfile << video.videoID << " " << video.title << " " << video.genre << " " << video.production << " " << video.numCopies << " " << video.imageFilename << endl;
+            }
+            outfile.close();
+        }
+    }
+
+    void loadCustomers() {
+        ifstream infile("customers.txt");
+        if (infile.is_open()) {
+            int id;
+            string name, address;
+            while (infile >> id >> name >> address) {
+                customers.emplace_back(id, name, address);
+            }
+            infile.close();
+        }
+    }
+
+    void saveCustomers() const {
+        ofstream outfile("customers.txt");
+        if (outfile.is_open()) {
+            for (const Customer& customer : customers) {
+                outfile << customer.customerID << " " << customer.name << " " << customer.address << endl;
+            }
+            outfile.close();
+        }
+    }
+
+    void loadCustomerRents() {
+        ifstream infile("customer_rents.txt");
+        if (infile.is_open()) {
+            int customerID, videoID;
+            while (infile >> customerID) {
+                CustomerRent customerRent(customerID);
+                while (infile >> videoID) {
+                    customerRent.rentVideo(videoID);
+                }
+                customerRents.push_back(customerRent);
+            }
+            infile.close();
+        }
+    }
+
+    void saveCustomerRents() const {
+        ofstream outfile("customer_rents.txt");
+        if (outfile.is_open()) {
+            for (const CustomerRent& customerRent : customerRents) {
+                outfile << customerRent.customerID;
+                for (int videoID : customerRent.rentedVideos) {
+                    outfile << " " << videoID;
+                }
+                outfile << endl;
+            }
+            outfile.close();
+        }
+    }
+};
+
+int main() {
+    VideoStore store;
+
+    int choice;
+    do {
+        cout << "Video Store Menu:\n";
+        cout << "1. New Video\n";
+        cout << "2. Rent a Video\n";
+        cout << "3. Return a Video\n";
+        cout << "4. Show Video Details\n";
+        cout << "5. Display all Videos\n";
+        cout << "6. Check Video Availability\n";
+        cout << "7. Customer Maintenance\n";
+        cout << "8. Exit Program\n";
+        cout << "Enter your choice: ";
+        cin >> choice;
+
+        switch (choice) {
+        case 1: {
+            string title, genre, production, filename;
+            int copies;
+            cout << "Enter title: ";
+            cin >> title;
+            cout << "Enter genre: ";
+            cin >> genre;
+            cout << "Enter production: ";
+            cin >> production;
+            cout << "Enter number of copies: ";
+            cin >> copies;
+            cout << "Enter image filename: ";
+            cin >> filename;
+            store.addVideo(title, genre, production, copies, filename);
+            break;
+        }
+        case 2: {
+            int customerID, videoID;
+            cout << "Enter customer ID: ";
+            cin >> customerID;
+            cout << "Enter video ID: ";
+            cin >> videoID;
+            store.rentVideo(customerID, videoID);
+            break;
+        }
+        case 3: {
+            int customerID, videoID;
+            cout << "Enter customer ID: ";
+            cin >> customerID;
+            cout << "Enter video ID: ";
+            cin >> videoID;
+            store.returnVideo(customerID, videoID);
+            break;
+        }
+        case 4: {
+            int videoID;
+            cout << "Enter video ID: ";
+            cin >> videoID;
+            store.showVideoDetails(videoID);
+            break;
+        }
+        case 5:
+            store.displayAllVideos();
+            break;
+        case 6: {
+            int videoID;
+            cout << "Enter video ID: ";
+            cin >> videoID;
+            store.checkVideoAvailability(videoID);
+            break;
+        }
+        case 7: {
+            int subChoice;
+            cout << "Customer Maintenance Menu:\n";
+            cout << "1. Add New Customer\n";
+            cout << "2. Show Customer Details\n";
+            cout << "3. List of Videos Rented by a Customer\n";
+            cout << "Enter your choice: ";
+            cin >> subChoice;
+
+            switch (subChoice) {
+            case 1: {
+                string name, address;
+                cout << "Enter name: ";
+                cin >> name;
+                cout << "Enter address: ";
+                cin >> address;
+                store.addCustomer(name, address);
+                break;
+            }
+            case 2: {
+                int customerID;
+                cout << "Enter customer ID: ";
+                cin >> customerID;
+                store.showCustomerDetails(customerID);
+                break;
+            }
+            case 3: {
+                int customerID;
+                cout << "Enter customer ID: ";
+                cin >> customerID;
+                store.listVideosRentedByCustomer(customerID);
+                break;
+            }
+            default:
+                cout << "Invalid choice." << endl;
+                break;
+            }
+            break;
+        }
+        case 8:
+            cout << "Exiting program..." << endl;
+            break;
+        default:
+            cout << "Invalid choice. Please try again." << endl;
+            break;
+        }
+
+    } while (choice != 8);
+
+    return 0;
+}
