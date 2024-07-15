@@ -1,10 +1,10 @@
 #include <iostream>
 #include <queue>
+#include <list>
 #include <stack>
 #include <map>
 #include <fstream>
 #include <string>
-#include <vector>
 #include <limits>
 #include <windows.h>
 using namespace std;
@@ -28,14 +28,11 @@ public:
     queue<Customer> customers;
     int nextCustomerID;
 
-public:
-    CustomerADT()
-        : nextCustomerID(1) {}
+    CustomerADT() : nextCustomerID(1) {}
 
     void addCustomer(const string& name, const string& address) {
         Customer newCustomer = {nextCustomerID++, name, address};
         customers.push(newCustomer);
-        saveNewCustomerToFile(newCustomer);
         system("cls");
 
         cout << "Customer added successfully!\n";
@@ -84,10 +81,15 @@ public:
         nextCustomerID = maxID + 1;
     }
 
-    void saveNewCustomerToFile(const Customer& customer) {
-        ofstream outfile("customers.txt", ios::app);
+    void saveNewCustomerToFile() {
+        ofstream outfile("customers.txt");
         if (outfile.is_open()) {
-            outfile << customer.customerID << " " << customer.name << "," << customer.address << endl;
+            queue<Customer> tempQueue = customers;
+            while (!tempQueue.empty()) {
+                Customer current = tempQueue.front();
+                tempQueue.pop();
+                outfile << current.customerID << " " << current.name << "," << current.address << endl;
+            }
             outfile.close();
         }
     }
@@ -108,7 +110,7 @@ public:
 
 class VideoADT {
 public:
-    vector<Video> videos;
+    list<Video> videos;
     int nextVideoID;
 
     VideoADT() : nextVideoID(1) {}
@@ -116,7 +118,6 @@ public:
     void addVideo(const string& title, const string& genre, const string& production, int numberOfCopies) {
         Video newVideo = {nextVideoID++, title, genre, production, numberOfCopies};
         videos.push_back(newVideo);
-        saveNewVideoToFile(newVideo);
         system("cls");
 
         cout << "Video added successfully!\n";
@@ -151,14 +152,6 @@ public:
         }
     }
 
-    void saveNewVideoToFile(const Video& video) {
-        ofstream outfile("videos.txt", ios::app);
-        if (outfile.is_open()) {
-            outfile << video.videoID << " " << video.title << "," << video.genre << "," << video.production << "," << video.numberOfCopies << endl;
-            outfile.close();
-        }
-    }
-
     void updateNextVideoID() {
         int maxID = 0;
         for (const auto& video : videos) {
@@ -173,7 +166,6 @@ public:
         for (auto& video : videos) {
             if (video.videoID == videoID) {
                 video.numberOfCopies += change;
-                saveAllVideosToFile();
                 break;
             }
         }
@@ -203,7 +195,6 @@ public:
     }
 };
 
-
 class CustomerRentADT {
 private:
     struct Rent {
@@ -214,15 +205,16 @@ public:
     map<int, Rent> customerRentals;
 
     void rentVideo(int customerID, int videoID, VideoADT& videoADT) {
-        if (videoADT.videos[videoID - 1].numberOfCopies > 0) {
-            customerRentals[customerID].customerID = customerID;
-            customerRentals[customerID].rentedVideoIDs.push(videoID);
-            videoADT.updateVideoCopies(videoID, -1);
-            saveAllRentalsToFile();
-            cout << "Video rented successfully!\n";
-        } else {
-            cout << "No copies available for rent!\n";
+        for (auto& video : videoADT.videos) {
+            if (video.videoID == videoID && video.numberOfCopies > 0) {
+                customerRentals[customerID].customerID = customerID;
+                customerRentals[customerID].rentedVideoIDs.push(videoID);
+                video.numberOfCopies--;
+                cout << "Video rented successfully!\n";
+                return;
+            }
         }
+        cout << "No copies available for rent!\n";
     }
 
     void returnVideo(int customerID, int videoID, VideoADT& videoADT) {
@@ -243,8 +235,12 @@ public:
                 tempStack.pop();
             }
             if (videoFound) {
-                videoADT.updateVideoCopies(videoID, +1);
-                saveAllRentalsToFile();
+                for (auto& video : videoADT.videos) {
+                    if (video.videoID == videoID) {
+                        video.numberOfCopies++;
+                        break;
+                    }
+                }
                 cout << "Video returned successfully!\n";
             } else {
                 cout << "The customer did not rent this video!\n";
@@ -277,185 +273,155 @@ public:
                 system("pause");
             } else {
                 system("cls");
-                cout << "This customer has not rented any videos.\n\n";
+                cout << "\nNo rented videos found for this customer.\n\n";
                 Sleep(500);
             }
         } else {
             system("cls");
-            cout << "Customer not found!\n\n";
+            cout << "\nCustomer not found!\n\n";
             Sleep(500);
         }
     }
 
-    const map<int, Rent>& getCustomerRentals() const {
-        return customerRentals;
-    }
-
-    void saveAllRentalsToFile() {
-        ofstream outfile("rentals.txt");
+    void saveCustomerRentalsToFile() {
+        ofstream outfile("customer_rent.txt");
         if (outfile.is_open()) {
-            for (const auto& [customerID, rent] : customerRentals) {
-                stack<int> tempStack = rent.rentedVideoIDs;
+            for (const auto& pair : customerRentals) {
+                outfile << pair.first << " ";
+                stack<int> tempStack = pair.second.rentedVideoIDs;
                 while (!tempStack.empty()) {
-                    outfile << customerID << " " << tempStack.top() << endl;
+                    outfile << tempStack.top() << " ";
                     tempStack.pop();
                 }
+                outfile << endl;
             }
             outfile.close();
         }
     }
 
-    void loadRentalsFromFile() {
-        ifstream infile("rentals.txt");
+    void loadCustomerRentalsFromFile() {
+        ifstream infile("customer_rent.txt");
         if (infile.is_open()) {
             int customerID, videoID;
-            while (infile >> customerID >> videoID) {
-                customerRentals[customerID].customerID = customerID;
-                customerRentals[customerID].rentedVideoIDs.push(videoID);
+            while (infile >> customerID) {
+                Rent rent;
+                rent.customerID = customerID;
+                while (infile >> videoID && videoID != -1) {
+                    rent.rentedVideoIDs.push(videoID);
+                }
+                customerRentals[customerID] = rent;
             }
             infile.close();
         }
     }
 };
 
-
 int main() {
-    CustomerADT customerADT;
     VideoADT videoADT;
+    CustomerADT customerADT;
     CustomerRentADT customerRentADT;
 
-    customerADT.loadCustomersFromFile();
     videoADT.loadVideosFromFile();
-    customerRentADT.loadRentalsFromFile();
+    customerADT.loadCustomersFromFile();
+    customerRentADT.loadCustomerRentalsFromFile();
 
     int choice;
     do {
-        system("cls");
+        cout << "----------------------\n";
         cout << "Video Rental System\n";
-        cout << "[1] Add New Customer\n";
-        cout << "[2] View Customer Details\n";
-        cout << "[3] View Customer Rental History\n";
-        cout << "[4] Add New Video\n";
-        cout << "[5] View Video Details\n";
-        cout << "[6] Rent a Video\n";
-        cout << "[7] Return a Video\n";
-        cout << "[8] Exit\n";
+        cout << "----------------------\n";
+        cout << "1. Add a new customer\n";
+        cout << "2. Show customer details\n";
+        cout << "3. Add a new video\n";
+        cout << "4. Show video details\n";
+        cout << "5. Rent a video\n";
+        cout << "6. Return a video\n";
+        cout << "7. Print list of videos rented by a customer\n";
+        cout << "8. Exit Program\n";
+        cout << "----------------------\n";
         cout << "Enter your choice: ";
-        
-        while (!(cin >> choice)) {
-            cin.clear();
-            cin.ignore(numeric_limits<streamsize>::max(), '\n');
-            cout << "Invalid input. Please enter a number: ";
-        }
-        cin.clear();
-        cin.ignore(numeric_limits<streamsize>::max(), '\n');
+        cin >> choice;
 
         switch (choice) {
-            case 1: {
-                string name, address;
-                cout << "Enter Name: ";
-                getline(cin, name);
-                cout << "Enter Address: ";
-                getline(cin, address);
-                customerADT.addCustomer(name, address);
-                break;
-            }
-            case 2: {
-                int customerID;
-                cout << "Enter Customer ID: ";
-                while (!(cin >> customerID)) {
-                    cin.clear();
-                    cin.ignore(numeric_limits<streamsize>::max(), '\n');
-                    cout << "Invalid input. Please enter a number: ";
-                }
-                customerADT.showCustomerDetails(customerID);
-                break;
-            }
-            case 3: {
-                int customerID;
-                cout << "Enter Customer ID: ";
-                while (!(cin >> customerID)) {
-                    cin.clear();
-                    cin.ignore(numeric_limits<streamsize>::max(), '\n');
-                    cout << "Invalid input. Please enter a number: ";
-                }
-                customerRentADT.printRentedVideos(customerID, customerADT.customers);
-                break;
-            }
-            case 4: {
-                string title, genre, production;
-                int numberOfCopies;
-                cout << "Enter Title: ";
-                getline(cin, title);
-                cout << "Enter Genre: ";
-                getline(cin, genre);
-                cout << "Enter Production: ";
-                getline(cin, production);
-                cout << "Enter Number of Copies: ";
-                while (!(cin >> numberOfCopies)) {
-                    cin.clear();
-                    cin.ignore(numeric_limits<streamsize>::max(), '\n');
-                    cout << "Invalid input. Please enter a number: ";
-                }
-                cin.clear();
-                cin.ignore(numeric_limits<streamsize>::max(), '\n');
-                videoADT.addVideo(title, genre, production, numberOfCopies);
-                break;
-            }
-            case 5: {
-                int videoID;
-                cout << "Enter Video ID: ";
-                while (!(cin >> videoID)) {
-                    cin.clear();
-                    cin.ignore(numeric_limits<streamsize>::max(), '\n');
-                    cout << "Invalid input. Please enter a number: ";
-                }
-                videoADT.showVideoDetails(videoID);
-                break;
-            }
-            case 6: {
-                int customerID, videoID;
-                cout << "Enter Customer ID: ";
-                while (!(cin >> customerID)) {
-                    cin.clear();
-                    cin.ignore(numeric_limits<streamsize>::max(), '\n');
-                    cout << "Invalid input. Please enter a number: ";
-                }
-                cout << "Enter Video ID: ";
-                while (!(cin >> videoID)) {
-                    cin.clear();
-                    cin.ignore(numeric_limits<streamsize>::max(), '\n');
-                    cout << "Invalid input. Please enter a number: ";
-                }
-                customerRentADT.rentVideo(customerID, videoID, videoADT);
-                break;
-            }
-            case 7: {
-                int customerID, videoID;
-                cout << "Enter Customer ID: ";
-                while (!(cin >> customerID)) {
-                    cin.clear();
-                    cin.ignore(numeric_limits<streamsize>::max(), '\n');
-                    cout << "Invalid input. Please enter a number: ";
-                }
-                cout << "Enter Video ID: ";
-                while (!(cin >> videoID)) {
-                    cin.clear();
-                    cin.ignore(numeric_limits<streamsize>::max(), '\n');
-                    cout << "Invalid input. Please enter a number: ";
-                }
-                customerRentADT.returnVideo(customerID, videoID, videoADT);
-                break;
-            }
-            case 8:
-                system("cls");
-                cout << "Exiting the program...\n";
-                break;
-            default:
-                system("cls");
-                cout << "Invalid choice! Please enter a valid option.\n";
-                Sleep(500);
-                break;
+        case 1: {
+            cin.ignore(numeric_limits<streamsize>::max(), '\n');
+            string name, address;
+            cout << "Enter customer name: ";
+            getline(cin, name);
+            cout << "Enter customer address: ";
+            getline(cin, address);
+            customerADT.addCustomer(name, address);
+            customerADT.saveNewCustomerToFile();
+            break;
+        }
+        case 2: {
+            int customerID;
+            cout << "Enter customer ID: ";
+            cin >> customerID;
+            customerADT.showCustomerDetails(customerID);
+            break;
+        }
+        case 3: {
+            cin.ignore(numeric_limits<streamsize>::max(), '\n');
+            string title, genre, production;
+            int numberOfCopies;
+            cout << "Enter video title: ";
+            getline(cin, title);
+            cout << "Enter video genre: ";
+            getline(cin, genre);
+            cout << "Enter video production: ";
+            getline(cin, production);
+            cout << "Enter number of copies: ";
+            cin >> numberOfCopies;
+            videoADT.addVideo(title, genre, production, numberOfCopies);
+            videoADT.saveAllVideosToFile();
+            break;
+        }
+        case 4: {
+            int videoID;
+            cout << "Enter video ID: ";
+            cin >> videoID;
+            videoADT.showVideoDetails(videoID);
+            break;
+        }
+        case 5: {
+            int customerID, videoID;
+            cout << "Enter customer ID: ";
+            cin >> customerID;
+            cout << "Enter video ID: ";
+            cin >> videoID;
+            customerRentADT.rentVideo(customerID, videoID, videoADT);
+            videoADT.saveAllVideosToFile();
+            customerRentADT.saveCustomerRentalsToFile();
+            break;
+        }
+        case 6: {
+            int customerID, videoID;
+            cout << "Enter customer ID: ";
+            cin >> customerID;
+            cout << "Enter video ID: ";
+            cin >> videoID;
+            customerRentADT.returnVideo(customerID, videoID, videoADT);
+            videoADT.saveAllVideosToFile();
+            customerRentADT.saveCustomerRentalsToFile();
+            break;
+        }
+        case 7: {
+            int customerID;
+            cout << "Enter customer ID: ";
+            cin >> customerID;
+            customerRentADT.printRentedVideos(customerID, customerADT.customers);
+            break;
+        }
+        case 8: {
+            videoADT.saveAllVideosToFile();
+            customerADT.saveNewCustomerToFile();
+            customerRentADT.saveCustomerRentalsToFile();
+            cout << "Exiting program...\n";
+            break;
+        }
+        default:
+            cout << "Invalid choice! Please try again.\n";
         }
     } while (choice != 8);
 
