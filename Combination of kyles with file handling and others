@@ -1,0 +1,404 @@
+#include <iostream>
+#include <queue>
+#include <stack>
+#include <map>
+#include <fstream>
+#include <string>
+#include <vector>
+#include <limits>
+#include <windows.h>
+using namespace std;
+
+struct Customer { // Customer information
+    int customerID;
+    string name;
+    string address;
+};
+
+struct Video { // Video information
+    int videoID;
+    string title;
+    string genre;
+};
+
+class CustomerADT {
+public:
+    queue<Customer> customers;
+    int nextCustomerID; // Declare nextCustomerID variable
+
+public:
+    CustomerADT()
+        : nextCustomerID(1) {} // Default constructor
+
+    void addCustomer(const string& name, const string& address) {
+        Customer newCustomer = {nextCustomerID++, name, address};
+        customers.push(newCustomer);
+        saveNewCustomerToFile(newCustomer);
+        system("cls");
+        
+        cout << "Customer added successfully!\n";
+        cout << "Customer ID: " << newCustomer.customerID << endl;
+        cout << "Name       : " << newCustomer.name << endl;
+        cout << "Address    : " << newCustomer.address << '\n' << endl;
+    }
+
+    void showCustomerDetails(int customerID) {
+        queue<Customer> tempQueue = customers;
+        bool found = false;
+
+        while (!tempQueue.empty()) {
+            Customer current = tempQueue.front();
+            tempQueue.pop();
+            if (current.customerID == customerID) {
+                system("cls");
+                cout << "Customer Details\n";
+                cout << "Customer ID: " << current.customerID << "\n";
+                cout << "Name: " << current.name << "\n";
+                cout << "Address: " << current.address << "\n";
+                system("pause");
+                cout << "\n";
+                found = true;
+                break;
+            }
+        }
+
+        if (!found) {
+            system("cls");
+            cout << "\nCustomer not found!\n\n";
+            Sleep(500);
+        }
+    }
+
+    void updateNextCustomerID() {
+        int maxID = 0;
+        queue<Customer> tempQueue = customers;
+        while (!tempQueue.empty()) {
+            Customer current = tempQueue.front();
+            tempQueue.pop();
+            if (current.customerID > maxID) {
+                maxID = current.customerID;
+            }
+        }
+        nextCustomerID = maxID + 1;
+    }
+
+    void saveNewCustomerToFile(const Customer& customer) {
+        ofstream outfile("customers.txt", ios::app);
+        if (outfile.is_open()) {
+            outfile << customer.customerID << " " << customer.name << "," << customer.address << endl;
+            outfile.close();
+        }
+    }
+};
+
+class VideoADT {
+public:
+    vector<Video> videos;
+    int nextVideoID;
+
+    VideoADT() : nextVideoID(1) {}
+
+    void addVideo(const string& title, const string& genre) {
+        Video newVideo = {nextVideoID++, title, genre};
+        videos.push_back(newVideo);
+        saveNewVideoToFile(newVideo);
+        system("cls");
+        
+        cout << "Video added successfully!\n";
+        cout << "Video ID: " << newVideo.videoID << endl;
+        cout << "Title   : " << newVideo.title << endl;
+        cout << "Genre   : " << newVideo.genre << '\n' << endl;
+    }
+
+    void showVideoDetails(int videoID) {
+        bool found = false;
+        for (const auto& video : videos) {
+            if (video.videoID == videoID) {
+                system("cls");
+                cout << "Video Details\n";
+                cout << "Video ID: " << video.videoID << "\n";
+                cout << "Title  : " << video.title << "\n";
+                cout << "Genre  : " << video.genre << "\n";
+                system("pause");
+                cout << "\n";
+                found = true;
+                break;
+            }
+        }
+        if (!found) {
+            system("cls");
+            cout << "\nVideo not found!\n\n";
+            Sleep(500);
+        }
+    }
+
+    void saveNewVideoToFile(const Video& video) {
+        ofstream outfile("videos.txt", ios::app);
+        if (outfile.is_open()) {
+            outfile << video.videoID << " " << video.title << "," << video.genre << endl;
+            outfile.close();
+        }
+    }
+
+    void updateNextVideoID() {
+        int maxID = 0;
+        for (const auto& video : videos) {
+            if (video.videoID > maxID) {
+                maxID = video.videoID;
+            }
+        }
+        nextVideoID = maxID + 1;
+    }
+};
+
+class CustomerRentADT { // Renting Movies
+private:
+    struct Rent {
+        int customerID;
+        stack<int> rentedVideoIDs;
+    };
+public:
+    map<int, Rent> customerRentals;
+
+    void rentVideo(int customerID, int videoID) {
+        customerRentals[customerID].customerID = customerID;
+        customerRentals[customerID].rentedVideoIDs.push(videoID);
+        saveNewRentalToFile(customerID, videoID);
+        cout << "Video rented successfully!\n";
+    }
+
+    void returnVideo(int customerID, int videoID) {
+        if (customerRentals.find(customerID) != customerRentals.end()) {
+            stack<int> tempStack;
+            while (!customerRentals[customerID].rentedVideoIDs.empty()) {
+                int top = customerRentals[customerID].rentedVideoIDs.top();
+                customerRentals[customerID].rentedVideoIDs.pop();
+                if (top != videoID) {
+                    tempStack.push(top);
+                }
+            }
+            while (!tempStack.empty()) {
+                customerRentals[customerID].rentedVideoIDs.push(tempStack.top());
+                tempStack.pop();
+            }
+            cout << "Video returned successfully!\n";
+        } else {
+            cout << "Customer not found!\n";
+        }
+    }
+
+    void printRentedVideos(int customerID, const queue<Customer>& customers) {
+        bool customerExists = false;
+        queue<Customer> tempQueue = customers;
+        while (!tempQueue.empty()) {
+            if (tempQueue.front().customerID == customerID) {
+                customerExists = true;
+                break;
+            }
+            tempQueue.pop();
+        }
+
+        if (customerExists) {
+            if (customerRentals.find(customerID) != customerRentals.end() && !customerRentals[customerID].rentedVideoIDs.empty()) {
+                stack<int> tempStack = customerRentals[customerID].rentedVideoIDs;
+                system("cls");
+                cout << "List of Videos Rented by Customer ID: " << customerID << "\n";
+                while (!tempStack.empty()) {
+                    cout << "Video ID: " << tempStack.top() << "\n";
+                    tempStack.pop();
+                }
+                system("pause");
+            } else {
+                system("cls");
+                cout << "This customer has not rented any videos.\n\n";
+                Sleep(500);
+            }
+        } else {
+            system("cls");
+            cout << "Customer not found!\n\n";
+            Sleep(500);
+        }
+    }
+
+    const map<int, Rent>& getCustomerRentals() const {
+        return customerRentals;
+    }
+
+    void saveNewRentalToFile(int customerID, int videoID) {
+        ofstream outfile("rentals.txt", ios::app);
+        if (outfile.is_open()) {
+            outfile << customerID << " " << videoID << endl;
+            outfile.close();
+        }
+    }
+};
+
+void loadCustomersFromFile(CustomerADT& customerADT) {
+    ifstream infile("customers.txt");
+    if (infile.is_open()) {
+        int id;
+        string name, address;
+        while (infile >> id >> ws && getline(infile, name, ',') && getline(infile, address)) {
+            customerADT.customers.push({id, name, address});
+        }
+        infile.close();
+    }
+    customerADT.updateNextCustomerID();
+}
+
+void loadVideosFromFile(VideoADT& videoADT) {
+    ifstream infile("videos.txt");
+    if (infile.is_open()) {
+        int id;
+        string title, genre;
+        while (infile >> id >> ws && getline(infile, title, ',') && getline(infile, genre)) {
+            videoADT.videos.push_back({id, title, genre});
+        }
+        infile.close();
+    }
+    videoADT.updateNextVideoID();
+}
+
+void loadRentalsFromFile(CustomerRentADT& customerRentADT) {
+    ifstream infile("rentals.txt");
+    if (infile.is_open()) {
+        int customerID, videoID;
+        while (infile >> customerID >> videoID) {
+            customerRentADT.customerRentals[customerID].customerID = customerID;
+            customerRentADT.customerRentals[customerID].rentedVideoIDs.push(videoID);
+        }
+        infile.close();
+    }
+}
+
+int main() {
+    CustomerADT customerADT;
+    VideoADT videoADT;
+    CustomerRentADT customerRentADT;
+    int choice;
+
+    // Load existing customers, videos, and rentals from the files
+    loadCustomersFromFile(customerADT);
+    loadVideosFromFile(videoADT);
+    loadRentalsFromFile(customerRentADT);
+
+    do {
+        cout << "VIDEO STORE MANAGEMENT\n";
+        cout << "[1] Add New Customer\n";
+        cout << "[2] View Customer Details\n";
+        cout << "[3] View Customer Rental History\n";
+        cout << "[4] Add New Video\n";
+        cout << "[5] View Video Details\n";
+        cout << "[6] Rent a Video\n";
+        cout << "[7] Return a Video\n";
+        cout << "[8] Exit\n";
+        cout << "Enter your choice: ";
+        
+        while (!(cin >> choice)) {
+            cin.clear();
+            cin.ignore(numeric_limits<streamsize>::max(), '\n');
+            cout << "Invalid input. Please enter a number: ";
+        }
+        cin.clear();
+        cin.ignore(numeric_limits<streamsize>::max(), '\n');
+
+        switch (choice) {
+            case 1: {
+                string name, address;
+                cout << "Enter Name: ";
+                getline(cin, name);
+                cout << "Enter Address: ";
+                getline(cin, address);
+                customerADT.addCustomer(name, address);
+                break;
+            }
+            case 2: {
+                int customerID;
+                cout << "Enter Customer ID: ";
+                while (!(cin >> customerID)) {
+                    cin.clear();
+                    cin.ignore(numeric_limits<streamsize>::max(), '\n');
+                    cout << "Invalid input. Please enter a number: ";
+                }
+                customerADT.showCustomerDetails(customerID);
+                break;
+            }
+            case 3: {
+                int customerID;
+                cout << "Enter Customer ID: ";
+                while (!(cin >> customerID)) {
+                    cin.clear();
+                    cin.ignore(numeric_limits<streamsize>::max(), '\n');
+                    cout << "Invalid input. Please enter a number: ";
+                }
+                customerRentADT.printRentedVideos(customerID, customerADT.customers);
+                break;
+            }
+            case 4: {
+                string title, genre;
+                cout << "Enter Title: ";
+                getline(cin, title);
+                cout << "Enter Genre: ";
+                getline(cin, genre);
+                videoADT.addVideo(title, genre);
+                break;
+            }
+            case 5: {
+                int videoID;
+                cout << "Enter Video ID: ";
+                while (!(cin >> videoID)) {
+                    cin.clear();
+                    cin.ignore(numeric_limits<streamsize>::max(), '\n');
+                    cout << "Invalid input. Please enter a number: ";
+                }
+                videoADT.showVideoDetails(videoID);
+                break;
+            }
+            case 6: {
+                int customerID, videoID;
+                cout << "Enter Customer ID: ";
+                while (!(cin >> customerID)) {
+                    cin.clear();
+                    cin.ignore(numeric_limits<streamsize>::max(), '\n');
+                    cout << "Invalid input. Please enter a number: ";
+                }
+                cout << "Enter Video ID: ";
+                while (!(cin >> videoID)) {
+                    cin.clear();
+                    cin.ignore(numeric_limits<streamsize>::max(), '\n');
+                    cout << "Invalid input. Please enter a number: ";
+                }
+                customerRentADT.rentVideo(customerID, videoID);
+                break;
+            }
+            case 7: {
+                int customerID, videoID;
+                cout << "Enter Customer ID: ";
+                while (!(cin >> customerID)) {
+                    cin.clear();
+                    cin.ignore(numeric_limits<streamsize>::max(), '\n');
+                    cout << "Invalid input. Please enter a number: ";
+                }
+                cout << "Enter Video ID: ";
+                while (!(cin >> videoID)) {
+                    cin.clear();
+                    cin.ignore(numeric_limits<streamsize>::max(), '\n');
+                    cout << "Invalid input. Please enter a number: ";
+                }
+                customerRentADT.returnVideo(customerID, videoID);
+                break;
+            }
+            case 8:
+                system("cls");
+                cout << "Exiting the program...\n";
+                break;
+            default:
+                system("cls");
+                cout << "Invalid choice! Please enter a valid option.\n";
+                Sleep(500);
+                break;
+        }
+    } while (choice != 8);
+
+    return 0;
+}
