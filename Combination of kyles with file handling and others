@@ -91,6 +91,19 @@ public:
             outfile.close();
         }
     }
+
+    void loadCustomersFromFile() {
+        ifstream infile("customers.txt");
+        if (infile.is_open()) {
+            int id;
+            string name, address;
+            while (infile >> id >> ws && getline(infile, name, ',') && getline(infile, address)) {
+                customers.push({id, name, address});
+            }
+            infile.close();
+            updateNextCustomerID();
+        }
+    }
 };
 
 class VideoADT {
@@ -175,7 +188,21 @@ public:
             outfile.close();
         }
     }
+
+    void loadVideosFromFile() {
+        ifstream infile("videos.txt");
+        if (infile.is_open()) {
+            int id, copies;
+            string title, genre, production;
+            while (infile >> id >> ws && getline(infile, title, ',') && getline(infile, genre, ',') && getline(infile, production, ',') && infile >> copies) {
+                videos.push_back({id, title, genre, production, copies});
+            }
+            infile.close();
+            updateNextVideoID();
+        }
+    }
 };
+
 
 class CustomerRentADT {
 private:
@@ -191,7 +218,7 @@ public:
             customerRentals[customerID].customerID = customerID;
             customerRentals[customerID].rentedVideoIDs.push(videoID);
             videoADT.updateVideoCopies(videoID, -1);
-            saveNewRentalToFile(customerID, videoID);
+            saveAllRentalsToFile();
             cout << "Video rented successfully!\n";
         } else {
             cout << "No copies available for rent!\n";
@@ -217,6 +244,7 @@ public:
             }
             if (videoFound) {
                 videoADT.updateVideoCopies(videoID, +1);
+                saveAllRentalsToFile();
                 cout << "Video returned successfully!\n";
             } else {
                 cout << "The customer did not rent this video!\n";
@@ -263,61 +291,42 @@ public:
         return customerRentals;
     }
 
-    void saveNewRentalToFile(int customerID, int videoID) {
-        ofstream outfile("rentals.txt", ios::app);
+    void saveAllRentalsToFile() {
+        ofstream outfile("rentals.txt");
         if (outfile.is_open()) {
-            outfile << customerID << " " << videoID << endl;
+            for (const auto& [customerID, rent] : customerRentals) {
+                stack<int> tempStack = rent.rentedVideoIDs;
+                while (!tempStack.empty()) {
+                    outfile << customerID << " " << tempStack.top() << endl;
+                    tempStack.pop();
+                }
+            }
             outfile.close();
+        }
+    }
+
+    void loadRentalsFromFile() {
+        ifstream infile("rentals.txt");
+        if (infile.is_open()) {
+            int customerID, videoID;
+            while (infile >> customerID >> videoID) {
+                customerRentals[customerID].customerID = customerID;
+                customerRentals[customerID].rentedVideoIDs.push(videoID);
+            }
+            infile.close();
         }
     }
 };
 
-void loadCustomersFromFile(CustomerADT& customerADT) {
-    ifstream infile("customers.txt");
-    if (infile.is_open()) {
-        int id;
-        string name, address;
-        while (infile >> id >> ws && getline(infile, name, ',') && getline(infile, address)) {
-            customerADT.customers.push({id, name, address});
-        }
-        infile.close();
-        customerADT.updateNextCustomerID();
-    }
-}
-
-void loadVideosFromFile(VideoADT& videoADT) {
-    ifstream infile("videos.txt");
-    if (infile.is_open()) {
-        int id, copies;
-        string title, genre, production;
-        while (infile >> id >> ws && getline(infile, title, ',') && getline(infile, genre, ',') && getline(infile, production, ',') && infile >> copies) {
-            videoADT.videos.push_back({id, title, genre, production, copies});
-        }
-        infile.close();
-        videoADT.updateNextVideoID();
-    }
-}
-
-void loadRentalsFromFile(CustomerRentADT& customerRentADT) {
-    ifstream infile("rentals.txt");
-    if (infile.is_open()) {
-        int customerID, videoID;
-        while (infile >> customerID >> videoID) {
-            customerRentADT.customerRentals[customerID].customerID = customerID;
-            customerRentADT.customerRentals[customerID].rentedVideoIDs.push(videoID);
-        }
-        infile.close();
-    }
-}
 
 int main() {
     CustomerADT customerADT;
     VideoADT videoADT;
     CustomerRentADT customerRentADT;
 
-    loadCustomersFromFile(customerADT);
-    loadVideosFromFile(videoADT);
-    loadRentalsFromFile(customerRentADT);
+    customerADT.loadCustomersFromFile();
+    videoADT.loadVideosFromFile();
+    customerRentADT.loadRentalsFromFile();
 
     int choice;
     do {
