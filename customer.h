@@ -16,6 +16,6 @@ private:
 
 public:
     void AddCustomer(const string& name, const string& address);
-    void CustomerDetails(int customerID);
+    int CustomerDetails(int customerID);
 };
 
