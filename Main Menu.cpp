@@ -12,8 +12,8 @@ int main(){
     RentADT rentADT;
     string name, address;
     int customerID, videoID;
+    int opta, ans;
 	char opt;
-	int opta, ans;
 	
 	do{
 		do{
@@ -47,15 +47,15 @@ int main(){
 					break;
 				case 3:
 					//3
-					cout<<"\n3";
+					cout << "\n3";
 					break;
 				case 4:
 					//4
-					cout<<"\n4";
+					cout << "\n4";
 					break;
 				case 5:
 					//5
-					cout<<"\n5";
+					cout << "\n5";
 					break;
 				case 6:
 					//6
@@ -64,14 +64,14 @@ int main(){
 				case 7:
 					//7
 					cin.clear();
-					cout<<"[1] Add New Customer"<<endl;
-					cout<<"[2] Show Customer Details"<<endl;
-					cout<<"[3] Videos Rented by a Customer"<<endl;
+					cout << "[1] Add New Customer" << endl;
+					cout << "[2] Show Customer Details" << endl;
+					cout << "[3] Videos Rented by a Customer" << endl;
 					
-					cout<<endl<<"Enter your option: ";
-					cin>>opta;
+					cout << endl << "Enter your option: ";
+					cin >> opta;
 					
-					//For the options of Customer Maintenance
+					// For the options of Customer Maintenance
 					switch(opta){
 						case 1:
 							cin.ignore();
@@ -92,7 +92,8 @@ int main(){
 						case 3:
                 			cout << "Enter Customer ID: ";
                 			cin >> customerID;
-                			rentADT.printRentedVideos(customerID);
+                			ans = customerADT.CustomerDetails(customerID);
+                			rentADT.printRentedVideos(customerID, ans);
 							break;
 						default:
 							Sleep(500);
@@ -105,12 +106,12 @@ int main(){
 					break;
 				case 8:
 					//8
-					cout<<"Thank you for using our program! <3";
+					cout << "Thank you for using our program! <3";
 					return 0;
 					break;
 				default:
 					Sleep(500);
-					cout<<"That is not an option"<<endl;
+					cout << "That is not an option" << endl;
 					system("pause");
 					opta = 0;
 					system("cls");
@@ -119,10 +120,10 @@ int main(){
 			
 		}while(opta == 0);
 		
-		////Loop for the option to run it again
+		// Loop for the option to run it again
 		do{
-			cout<<endl<<"Do you want to go back to the Main Menu: ";
-			cin>>opt;
+			cout << endl << "Do you want to go back to the Main Menu: ";
+			cin >> opt;
 			
 			switch(opt){
 			case 'Y':
@@ -134,7 +135,7 @@ int main(){
 				break;
 			default:
 				Sleep(500);
-				cout<<"That is not an option"<<endl;
+				cout << "That is not an option" << endl;
 				system("pause");
 				system("cls");
 				opt = 'a';
@@ -144,6 +145,6 @@ int main(){
 		
 	}while(opt == 'Y' || opt == 'y');
 	
-	cout<<"Thank you for using our program! <3";
+	cout << "Thank you for using our program! <3";
 	
 }
