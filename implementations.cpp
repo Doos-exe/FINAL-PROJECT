@@ -8,6 +8,7 @@
 
 using namespace std;
 
+// function for adding customers
 void CustomerADT::AddCustomer(const string& name, const string& address){
 	
 	Customer newCustomer = {nextCustomerID++, name, address};
@@ -21,9 +22,11 @@ void CustomerADT::AddCustomer(const string& name, const string& address){
 
 }
 
-void CustomerADT::CustomerDetails(int customerID){
+// function for customer details
+int CustomerADT::CustomerDetails(int customerID){
 	    queue<Customer> tempQueue = customers;
-        bool found = false;
+	    int ans;
+	    bool found = false;
 
         while (!tempQueue.empty()) {
             Customer current = tempQueue.front();
@@ -44,15 +47,56 @@ void CustomerADT::CustomerDetails(int customerID){
             system("cls");
             cout << "\nCustomer not found!\n\n";
             Sleep(500);
+            ans = 0;
         }
+        
+        return ans;
 }
 
-void RentADT::RentVideo(int customerID, int videoID){
-	customerRentals[customerID].customerID = customerID;
-    customerRentals[customerID].rentedVideoIDs.push(videoID);
-    cout << "Video rented successfully!\n";
+// function for renting videos
+void RentADT::RentVideo(int customerID, int ans){
+	int videoID;
+	char opt;
+	
+	if(ans == 0){
+		return;
+	}
+	do{
+		cout << "Video ID: ";
+		cin >> videoID;
+	
+		//file handling
+	
+		customerRentals[customerID].customerID = customerID;
+    	customerRentals[customerID].rentedVideoIDs.push(videoID);
+    	cout << "Video rented successfully!\n";
+    	
+    	do{
+    		cout << endl << "Rent another Video as Customer ID " << customerID << "? ";
+			cin>>opt;
+			
+			switch(opt){
+			case 'Y':
+			case 'y':
+				system("cls");
+				break;
+			case 'N':
+			case 'n':
+				break;
+			default:
+				cin.ignore();
+				cout<<"That is not an option \nPlease press enter to try again..."<<endl;
+				cin.get();
+				system("cls");
+				opt = 'a';
+				break;	
+			}
+		}while(opt == 'a');
+	
+	}while(opt == 'Y' || opt == 'y');
 }
 
+// function for returning videos
 void RentADT::ReturnVideo(int customerID, int videoID) {
         if (customerRentals.find(customerID) != customerRentals.end()) {
             stack<int> tempStack;
@@ -73,6 +117,7 @@ void RentADT::ReturnVideo(int customerID, int videoID) {
         }
 }
 
+// function for rented videos of a customer
 void RentADT::printRentedVideos(int customerID) {
     if (customerRentals.find(customerID) != customerRentals.end()) {
         stack<int> tempStack = customerRentals[customerID].rentedVideoIDs;
