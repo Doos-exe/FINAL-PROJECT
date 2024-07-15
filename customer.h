@@ -10,12 +10,18 @@ struct Customer{
 };
 
 class CustomerADT{
-private:
+public:
     queue<Customer> customers;
-    int nextCustomerID = 1;
+    int nextCustomerID;
 
 public:
+	CustomerADT():
+		nextCustomerID(1) {}
+		
     void AddCustomer(const string& name, const string& address);
-    int CustomerDetails(int customerID);
+    void CustomerDetails(int customerID);
+    void updateNextCustomerID();
+    void saveNewCustomerToFile(const Customer& customer);
+    void loadCustomerFromFile();
 };
 
