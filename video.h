@@ -1,27 +1,29 @@
-struct Node {
-	int data;
-	struct Node* next;
+#include <string>
+#include <list>
+
+using namespace std;
+
+struct Video{
+    int videoID;
+    string title;
+    string genre;
+    string production;
+    int numberOfCopies;
 };
 
-class Video {
-	private:
-		Node* head;
+class VideoADT {
 	public:
-		LinkedList() {
-			head = NULL;
-		}
-	void insertAtBeginning(int val);
-	void insertAfter(int val,int pos);
-	void insert(int val);
-	void removeAt(int pos);
-	bool search(int val);
-	bool isEmpty();
-	bool isFull();
-	void printList();
-	int getSize();
+    	list<Video> videos;
+    	int nextVideoID;
 	
-	void VideoDetails();
-	void DisplayVideo();
-	void VideoAvailability();
+    	VideoADT() : nextVideoID(1) {}
+    	
+    	void addVideo(const string& title, const string& genre, const string& production, int numberOfCopies);
+    	void showVideoDetails(int videoID);
+    	void saveNewVideoToFile(const Video& video);
+    	void saveAllVideosToFile();
+    	void updateNextVideoID();
+    	void updateVideoCopies(int videoID, int change);
+    	void loadVideoFromFile();
 };
 
