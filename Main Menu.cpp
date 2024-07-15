@@ -11,23 +11,23 @@ int main(){
 	CustomerADT customerADT;
     RentADT rentADT;
     string name, address;
-    int customerID;
+    int customerID, videoID;
 	char opt;
-	int opta;
+	int opta, ans;
 	
 	do{
 		do{
-			cout<<"Welcome to [insert name]!"<<endl;
-			cout<<"\n--*--*--*--*--*--MAIN MENU--*--*--*--*--*--\n";
+			cout << "Welcome to [insert name]!" << endl;
+			cout << "\n--*--*--*--*--*--MAIN MENU--*--*--*--*--*--\n";
 	
-			cout<<"[1] New Video"<<endl;
-			cout<<"[2] Rent a Video"<<endl;
-			cout<<"[3] Return a Video"<<endl;
-			cout<<"[4] Show Video Details"<<endl;
-			cout<<"[5] List of All Videos"<<endl;
-			cout<<"[6] Check Video Availability"<<endl;
-			cout<<"[7] Customer Maintenance"<<endl;
-			cout<<"[8] Exit"<<endl;
+			cout << "[1] New Video" << endl;
+			cout << "[2] Rent a Video" << endl;
+			cout << "[3] Return a Video" << endl;
+			cout << "[4] Show Video Details" << endl;
+			cout << "[5] List of All Videos" << endl;
+			cout << "[6] Check Video Availability" << endl;
+			cout << "[7] Customer Maintenance" << endl;
+			cout << "[8] Exit"<<endl;
 		
 		
 			cout<<endl<<"Enter your option: ";
@@ -36,11 +36,14 @@ int main(){
 			switch(opta){
 				case 1:
 					//1
-					cout<<"\n1";
+					cout << "\n1";
 					break;
 				case 2:
-					//2
-					cout<<"\n2";
+					system("cls");
+					cout << "Enter Customer ID: ";
+    				cin >> customerID;
+    				ans = customerADT.CustomerDetails(customerID);
+					rentADT.RentVideo(customerID, ans);
 					break;
 				case 3:
 					//3
@@ -72,25 +75,24 @@ int main(){
 					switch(opta){
 						case 1:
 							cin.ignore();
-							
 							system("cls");
-                					cout << "Enter Name: ";
-                					getline(cin ,name);
-                					cout << "Enter Address: ";
-                					getline(cin ,address);
-                					customerADT.AddCustomer(name, address);
+                			cout << "Enter Name: ";
+                			getline(cin ,name);
+                			cout << "Enter Address: ";
+                			getline(cin ,address);
+                			customerADT.AddCustomer(name, address);
 							break;
 						case 2:
-                					cout << "Enter Customer ID: ";
-                					cin >> customerID;
-                					cin.clear();
-                					cin.ignore(numeric_limits<streamsize>::max(), '\n');
-                					customerADT.CustomerDetails(customerID);
+                			cout << "Enter Customer ID: ";
+                			cin >> customerID;
+                			cin.clear();
+                			cin.ignore(numeric_limits<streamsize>::max(), '\n');
+                			customerADT.CustomerDetails(customerID);
 							break;
 						case 3:
-                					cout << "Enter Customer ID: ";
-                					cin >> customerID;
-                					rentADT.printRentedVideos(customerID);
+                			cout << "Enter Customer ID: ";
+                			cin >> customerID;
+                			rentADT.printRentedVideos(customerID);
 							break;
 						default:
 							Sleep(500);
