@@ -11,11 +11,18 @@ class RentADT{
         	stack<int> rentedVideoIDs;
     	};
     	
-    	map<int, Rent> customerRentals;
 	public:
+		map<int, Rent> customerRentals;
+		
 		void RentVideo(int customerID, int videoID);
 		void ReturnVideo(int customerID, int videoID);
-		void printRentedVideos(int customerID);
+		void printRentedVideos(int customerID,  const queue<Customer>& customers);
+		void saveNewRentalToFile(int customerID, int videoID);
+		void saveCustomerRentalToFile();
+		void loadRentalsFromFile();
+		char again();
 		
-		//void NewVideo();
+		const map<int, Rent> getCustomerRentals()const{
+			return customerRentals;
+		}
 };
