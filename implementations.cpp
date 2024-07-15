@@ -58,9 +58,11 @@ void RentADT::RentVideo(int customerID, int ans){
 	int videoID;
 	char opt;
 	
+	// if customer is not found, return
 	if(ans == 0){
 		return;
 	}
+	
 	do{
 		cout << "Video ID: ";
 		cin >> videoID;
@@ -84,9 +86,8 @@ void RentADT::RentVideo(int customerID, int ans){
 			case 'n':
 				break;
 			default:
-				cin.ignore();
-				cout<<"That is not an option \nPlease press enter to try again..."<<endl;
-				cin.get();
+				cout<<"That is not an option"<<endl;
+				system("pause");
 				system("cls");
 				opt = 'a';
 				break;	
@@ -118,7 +119,11 @@ void RentADT::ReturnVideo(int customerID, int videoID) {
 }
 
 // function for rented videos of a customer
-void RentADT::printRentedVideos(int customerID) {
+void RentADT::printRentedVideos(int customerID, int ans) {
+	if(ans == 0){
+		return;
+	}
+	
     if (customerRentals.find(customerID) != customerRentals.end()) {
         stack<int> tempStack = customerRentals[customerID].rentedVideoIDs;
         cout << "List of Videos Rented by Customer ID: " << customerID << "\n";
@@ -131,7 +136,7 @@ void RentADT::printRentedVideos(int customerID) {
 			
 	else {
 		system("cls");
-        cout << "Customer not found!\n";
+        cout << "No movies rented!\n";
         Sleep(500);
     }
 }
