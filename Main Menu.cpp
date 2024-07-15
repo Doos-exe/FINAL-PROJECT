@@ -1,5 +1,6 @@
 #include "customer.h"
 #include "rent.h"
+#include "video.h"
 #include <iostream>
 #include <string>
 #include <limits>
@@ -10,10 +11,15 @@ using namespace std;
 int main(){
 	CustomerADT customerADT;
     RentADT rentADT;
-    string name, address;
-    int customerID, videoID;
+    VideoADT videoADT;
+    string name, address, title, genre, production;
+    int customerID, videoID, numberOfCopies;
     int opta, ans;
 	char opt;
+	
+	customerADT.loadCustomerFromFile();
+	rentADT.loadRentalsFromFile();
+	videoADT.loadVideoFromFile();
 	
 	do{
 		do{
@@ -35,23 +41,44 @@ int main(){
 	
 			switch(opta){
 				case 1:
-					//1
-					cout << "\n1";
+					cin.ignore(numeric_limits<streamsize>::max(), '\n');
+           		 	cout << "Enter video title: ";
+            		getline(cin, title);
+            		cout << "Enter video genre: ";
+            		getline(cin, genre);
+            		cout << "Enter video production: ";
+            		getline(cin, production);
+            		cout << "Enter number of copies: ";
+            		cin >> numberOfCopies;
+            		videoADT.addVideo(title, genre, production, numberOfCopies);
+            		videoADT.saveAllVideosToFile();
 					break;
 				case 2:
-					system("cls");
-					cout << "Enter Customer ID: ";
-    				cin >> customerID;
-    				ans = customerADT.CustomerDetails(customerID);
-					rentADT.RentVideo(customerID, ans);
+            		cout << "Enter customer ID: ";
+            		cin >> customerID;
+            		cout << "Enter video ID: ";
+            		cin >> videoID;
+            		rentADT.RentVideo(customerID, videoID);
+            		videoADT.saveAllVideosToFile();
+            		rentADT.saveCustomerRentalToFile();
 					break;
 				case 3:
-					//3
-					cout << "\n3";
+					do{
+            			cout << "Enter customer ID: ";
+            			cin >> customerID;
+            			cout << "Enter video ID: ";
+            			cin >> videoID;
+            			rentADT.ReturnVideo(customerID, videoID);
+            			videoADT.saveAllVideosToFile();
+            			rentADT.saveCustomerRentalToFile();
+            			
+            			opt = rentADT.again();
+					}while(opt == 'Y' || opt == 'y');
 					break;
 				case 4:
-					//4
-					cout << "\n4";
+            		cout << "Enter video ID: ";
+            		cin >> videoID;
+            		videoADT.showVideoDetails(videoID);
 					break;
 				case 5:
 					//5
@@ -92,8 +119,7 @@ int main(){
 						case 3:
                 			cout << "Enter Customer ID: ";
                 			cin >> customerID;
-                			ans = customerADT.CustomerDetails(customerID);
-                			rentADT.printRentedVideos(customerID, ans);
+                			rentADT.printRentedVideos(customerID, customerADT.customers);
 							break;
 						default:
 							Sleep(500);
