@@ -263,12 +263,18 @@ public:
 
         if (customerExists) {
             if (customerRentals.find(customerID) != customerRentals.end() && !customerRentals[customerID].rentedVideoIDs.empty()) {
+                map<int, int> videoCount;
                 stack<int> tempStack = customerRentals[customerID].rentedVideoIDs;
+                while (!tempStack.empty()) {
+                    int videoID = tempStack.top();
+                    tempStack.pop();
+                    videoCount[videoID]++;
+                }
+
                 system("cls");
                 cout << "List of Videos Rented by Customer ID: " << customerID << "\n";
-                while (!tempStack.empty()) {
-                    cout << "Video ID: " << tempStack.top() << "\n";
-                    tempStack.pop();
+                for (const auto& pair : videoCount) {
+                    cout << "Video ID: " << pair.first << ", " << pair.second << " copies rented\n";
                 }
                 system("pause");
             } else {
@@ -319,7 +325,7 @@ public:
 int main() {
     VideoADT videoADT;
     CustomerADT customerADT;
-    CustomerRentADT customerRentADT;
+    CustomerRentADT customerRentADT;	
 
     videoADT.loadVideosFromFile();
     customerADT.loadCustomersFromFile();
