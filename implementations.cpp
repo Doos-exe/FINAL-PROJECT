@@ -1,4 +1,4 @@
-#include "customer.h"
+#include "renting.h"
 #include <string>
 #include <iostream>
 #include <limits>
@@ -163,6 +163,45 @@ void VideoADT::saveAllVideosToFile() {
             outfile << video.videoID << " " << video.title << "," << video.genre << "," << video.production << "," << video.numberOfCopies << endl;
         }
     	outfile.close();
+    }
+}
+
+// function for displaying all videos
+void VideoADT::displayAllVideos() {
+    cout << "All Videos:" << endl;
+    for (const auto& video : videos) {
+        cout << "Video ID: " << video.videoID << endl;
+        cout << "Title: " << video.title << endl;
+        cout << "Genre: " << video.genre << endl;
+        cout << "Production: " << video.production << endl;
+        cout << "-----------------------------" << endl;
+    }
+}
+
+// function for checking if a video is available
+void VideoADT::checkVideoAvailability(int videoID) {
+    bool found = false;
+    for (const auto& video : videos) {
+        if (video.videoID == videoID) {
+            system("cls");
+            cout << "Video Details\n";
+            cout << "Video ID      : " << video.videoID << "\n";
+            cout << "Title         : " << video.title << "\n";
+            cout << "Genre         : " << video.genre << "\n";
+            cout << "Production    : " << video.production << "\n";
+            cout << "No. of Copies : " << video.numberOfCopies << "\n";
+            
+            if (video.numberOfCopies > 0) {
+                cout << "Availability  : Available\n";
+            } else {
+                cout << "Availability  : Not Available\n";
+            }
+            
+            system("pause");
+            cout << "\n";
+            found = true;
+            break;
+        }
     }
 }
 
