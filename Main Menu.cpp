@@ -1,4 +1,4 @@
-#include "customer.h"
+#include "renting.h"
 #include <iostream>
 #include <string>
 #include <limits>
@@ -79,12 +79,13 @@ int main(){
             		videoADT.showVideoDetails(videoID);
 					break;
 				case 5:
-					//5
-					cout << "\n5";
+					system("cls");
+					videoADT.displayAllVideos();
 					break;
 				case 6:
-					//6
-					cout<<"\n6";
+					cout << "Enter video ID: ";
+					cin >> videoID;
+					videoADT.checkVideoAvailability(videoID);
 					break;
 				case 7:
 					//7
