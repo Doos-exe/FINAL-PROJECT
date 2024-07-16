@@ -1,6 +1,4 @@
-#include "video.h"
 #include "customer.h"
-#include "rent.h"
 #include <string>
 #include <iostream>
 #include <limits>
@@ -169,8 +167,8 @@ void VideoADT::saveAllVideosToFile() {
 }
 
 // function for renting videos
-void RentADT::RentVideo(int customerID, int videoID){
-	VideoADT videoADT;
+void RentADT::RentVideo(int customerID, int videoID, VideoADT& videoADT){
+
 	for (auto& video : videoADT.videos) {
         if (video.videoID == videoID && video.numberOfCopies > 0) {
             customerRentals[customerID].customerID = customerID;
@@ -186,30 +184,38 @@ void RentADT::RentVideo(int customerID, int videoID){
 
 
 // function for returning videos
-void RentADT::ReturnVideo(int customerID, int videoID) {
+void RentADT::ReturnVideo(int customerID, int videoID, VideoADT& videoADT) {
         if (customerRentals.find(customerID) != customerRentals.end()) {
             stack<int> tempStack;
+            bool videoFound = false;
             while (!customerRentals[customerID].rentedVideoIDs.empty()) {
                 int top = customerRentals[customerID].rentedVideoIDs.top();
                 customerRentals[customerID].rentedVideoIDs.pop();
-                if (top != videoID) {
+                if (top == videoID) {
+                    videoFound = true;
+                } else {
                     tempStack.push(top);
                 }
             }
-            
-			while (!tempStack.empty()) {
+            while (!tempStack.empty()) {
                 customerRentals[customerID].rentedVideoIDs.push(tempStack.top());
                 tempStack.pop();
             }
-            
-            cout << "Video returned successfully!\n";
-        } 
-		
-		else {
+            if (videoFound) {
+                for (auto& video : videoADT.videos) {
+                    if (video.videoID == videoID) {
+                        video.numberOfCopies++;
+                        break;
+                    }
+                }
+                cout << "Video returned successfully!\n";
+            } else {
+                cout << "The customer did not rent this video!\n";
+            }
+        } else {
             cout << "Customer not found!\n";
         }
-}
-
+    }
 // function for rented videos of a customer
 void RentADT::printRentedVideos(int customerID, const queue<Customer>& customers) {
 	bool customerExists = false;

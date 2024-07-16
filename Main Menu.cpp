@@ -1,6 +1,4 @@
 #include "customer.h"
-#include "rent.h"
-#include "video.h"
 #include <iostream>
 #include <string>
 #include <limits>
@@ -13,7 +11,7 @@ int main(){
     RentADT rentADT;
     VideoADT videoADT;
     string name, address, title, genre, production;
-    int customerID, videoID, numberOfCopies;
+    int customerID, videoID, numberOfCopies, duration, latefee;
     int opta, ans;
 	char opt;
 	
@@ -58,7 +56,7 @@ int main(){
             		cin >> customerID;
             		cout << "Enter video ID: ";
             		cin >> videoID;
-            		rentADT.RentVideo(customerID, videoID);
+            		rentADT.RentVideo(customerID, videoID, videoADT);
             		videoADT.saveAllVideosToFile();
             		rentADT.saveCustomerRentalToFile();
 					break;
@@ -68,7 +66,7 @@ int main(){
             			cin >> customerID;
             			cout << "Enter video ID: ";
             			cin >> videoID;
-            			rentADT.ReturnVideo(customerID, videoID);
+            			rentADT.ReturnVideo(customerID, videoID, videoADT);
             			videoADT.saveAllVideosToFile();
             			rentADT.saveCustomerRentalToFile();
             			
