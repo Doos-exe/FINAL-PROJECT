@@ -1,0 +1,25 @@
+1 The Conjuring,Horror,New Line Cinema,10
+2 Hereditary,Horror,A24,10
+3 Don't Breathe,Horror,Screen Gems,10
+4 A Quiet Place,Horror,Platinum Dunes,10
+5 The Purge,Horror,Blumhouse Productions,10
+6 La La Land,Romance,Summit Entertainment,10
+7 Corpse Bride,Romance,Tim Burton Productions,10
+8 Crazy Rich Asians,Romance,SK Global,10
+9 13 Going on 30,Romance,Columbia Pictures,10
+10 Warm Bodies,Romance,Mandeville Films,10
+11 Inception,Sci-fi,Warner Bros. Pictures,10
+12 Interstellar,Sci-fi,Paramount Pictures,10
+13 Blade Runner 2049,Sci-fi,Columbia Pictures,10
+14 Ready Player One,Sci-fi,Warner Bros. Pictures,10
+15 Dune,Sci-fi,Legendary Pictures,10
+16 Mad Max: Fury Road,Action,Village Roadshow Pictures,10
+17 John Wick,Action,Thunder Road Pictures,10
+18 Mission: Impossible - Fallout,Action,Skydance,10
+19 The Dark Knight Rises,Action,Warner Bros. Pictures,10
+20 Killer Bean Forever,Action,Killer Bean Studios,10
+21 Central Intelligence,Comedy,Universal Pictures,10
+22 Rush Hour,Comedy,Roger Birnbaum Productions,10
+23 21 Jump Street,Comedy,SJC Studios,10
+24 Deadpool,Comedy,Marvel Entertainment,10
+25 Scary Movie,Comedy,Wayans Bros. Entertainment,10
