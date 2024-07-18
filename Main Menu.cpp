@@ -54,11 +54,15 @@ int main(){
 				case 2:
             		cout << "Enter customer ID: ";
             		cin >> customerID;
-            		cout << "Enter video ID: ";
-            		cin >> videoID;
-            		rentADT.RentVideo(customerID, videoID, videoADT);
-            		videoADT.saveAllVideosToFile();
-            		rentADT.saveCustomerRentalToFile();
+            		do{
+            			cout << "Enter video ID: ";
+            			cin >> videoID;
+            			rentADT.RentVideo(customerID, videoID, videoADT);
+            			videoADT.saveAllVideosToFile();
+            			rentADT.saveCustomerRentalToFile();
+            			opt = rentADT.again(opta);
+					}while (opt == 'Y');
+            		
 					break;
 				case 3:
 					do{
@@ -69,8 +73,7 @@ int main(){
             			rentADT.ReturnVideo(customerID, videoID, videoADT);
             			videoADT.saveAllVideosToFile();
             			rentADT.saveCustomerRentalToFile();
-            			
-            			opt = rentADT.again();
+            			opt = rentADT.again(opta);
 					}while(opt == 'Y' || opt == 'y');
 					break;
 				case 4:
