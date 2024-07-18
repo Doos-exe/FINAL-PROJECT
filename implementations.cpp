@@ -5,6 +5,7 @@
 #include <list>
 #include <windows.h>
 #include <fstream>
+#include <bits/stdc++.h> 
 
 using namespace std;
 
@@ -110,7 +111,6 @@ void VideoADT::showVideoDetails(int videoID) {
             cout << "Genre         : " << video.genre << "\n";
             cout << "Production    : " << video.production << "\n";
             cout << "No. of Copies : " << video.numberOfCopies << "\n";
-            system("pause");
             cout << "\n";
             found = true;
             break;
@@ -166,8 +166,8 @@ void VideoADT::saveAllVideosToFile() {
     }
 }
 
-// function for displaying all videos
-void VideoADT::displayAllVideos() {
+// function for displaying all videos 
+/*void VideoADT::displayAllVideos() {
     cout << "All Videos:" << endl;
     for (const auto& video : videos) {
         cout << "Video ID: " << video.videoID << endl;
@@ -175,6 +175,42 @@ void VideoADT::displayAllVideos() {
         cout << "Genre: " << video.genre << endl;
         cout << "Production: " << video.production << endl;
         cout << "-----------------------------" << endl;
+        
+    }
+}*/
+
+// function for displaying all videos and best seller
+void VideoADT::displayAllVideos() {
+	int bestSeller, copies;
+	string videoName;
+	
+	for (const auto& video : videos){
+		bestSeller = video.videoID;
+		copies = video.numberOfCopies;
+		videoName = video.title;
+	}
+	
+	for (const auto& video : videos){
+		if (video.numberOfCopies < copies){
+			bestSeller = video.videoID;
+			copies = video.numberOfCopies;
+			videoName = video.title;
+		}
+	}
+	
+	cout << "*** OUR BEST SELLER ***" << endl; 
+	cout << "Video ID: " << bestSeller << endl; 
+	cout << "Title: " << videoName << endl;
+	cout << "************************" << endl << endl;
+	
+    cout << "All Videos:" << endl;
+    for (const auto& video : videos) {
+        cout << "Video ID: " << video.videoID << endl;
+        cout << "Title: " << video.title << endl;
+        cout << "Genre: " << video.genre << endl;
+        cout << "Production: " << video.production << endl;
+        cout << "-----------------------------" << endl;
+        
     }
 }
 
@@ -197,7 +233,6 @@ void VideoADT::checkVideoAvailability(int videoID) {
                 cout << "Availability  : Not Available\n";
             }
             
-            system("pause");
             cout << "\n";
             found = true;
             break;
@@ -285,7 +320,6 @@ void RentADT::printRentedVideos(int customerID, const queue<Customer>& customers
 			for (const auto& pair : videoCount) {
                 cout << "Video ID: " << pair.first << ", " << pair.second << " copies rented\n";
             }
-            system("pause");
         } 
 		
 		else {
@@ -382,16 +416,24 @@ void RentADT::loadRentalsFromFile(){
 
 
 // function for again option
-char RentADT::again(){
+char RentADT::again(int opta){
 	char opt;
 	do{
-		cout<<endl<<"Do you want to try again? ";
-		cin>>opt;
+		if (opta == 2){
+			cout<<endl<<"Do you want to rent another video? ";
+			cin>>opt;
+		}
+		
+		if (opta == 3){
+			cout<<endl<<"Do you want to return another video? ";
+			cin>>opt;
+		}
 			
 			switch(opt){
 			case 'Y':
 			case 'y':
-				system("cls");
+				opt = 'Y';
+				cout << endl;
 				break;
 			case 'N':
 			case 'n':
