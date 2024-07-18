@@ -21,7 +21,7 @@ int main(){
 	
 	do{
 		do{
-			cout << "Welcome to [insert name]!" << endl;
+			cout << "Welcome to WL Renting Store!" << endl;
 			cout << "\n--*--*--*--*--*--MAIN MENU--*--*--*--*--*--\n";
 	
 			cout << "[1] New Video" << endl;
@@ -33,10 +33,19 @@ int main(){
 			cout << "[7] Customer Maintenance" << endl;
 			cout << "[8] Exit"<<endl;
 		
-		
-			cout<<endl<<"Enter your option: ";
-			cin>>opta;
-	
+			while (true){
+					cout << "Enter your option: ";
+					cin >> opta;
+					if (!cin){
+						cout << "\nThat is not an option" << endl;
+						cin.clear();
+						cin.ignore(numeric_limits<streamsize>::max(), '\n');
+						continue;	
+					}
+					else break;
+			}
+			
+			// Main Menu options
 			switch(opta){
 				case 1:
 					cin.ignore(numeric_limits<streamsize>::max(), '\n');
@@ -91,14 +100,22 @@ int main(){
 					videoADT.checkVideoAvailability(videoID);
 					break;
 				case 7:
-					//7
 					cin.clear();
 					cout << "[1] Add New Customer" << endl;
 					cout << "[2] Show Customer Details" << endl;
 					cout << "[3] Videos Rented by a Customer" << endl;
 					
-					cout << endl << "Enter your option: ";
+					while (true){
+					cout << "Enter your option: ";
 					cin >> opta;
+					if (!cin){
+						cout << "\nThat is not an option" << endl;
+						cin.clear();
+						cin.ignore(numeric_limits<streamsize>::max(), '\n');
+						continue;	
+					}
+					else break;
+			}
 					
 					// For the options of Customer Maintenance
 					switch(opta){
@@ -133,7 +150,6 @@ int main(){
 					}	
 					break;
 				case 8:
-					//8
 					cout << "Thank you for using our program! <3";
 					return 0;
 					break;
@@ -145,6 +161,7 @@ int main(){
 					system("cls");
 					break;
 			}
+			
 			
 		}while(opta == 0);
 		
