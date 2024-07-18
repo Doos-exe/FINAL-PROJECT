@@ -166,19 +166,6 @@ void VideoADT::saveAllVideosToFile() {
     }
 }
 
-// function for displaying all videos 
-/*void VideoADT::displayAllVideos() {
-    cout << "All Videos:" << endl;
-    for (const auto& video : videos) {
-        cout << "Video ID: " << video.videoID << endl;
-        cout << "Title: " << video.title << endl;
-        cout << "Genre: " << video.genre << endl;
-        cout << "Production: " << video.production << endl;
-        cout << "-----------------------------" << endl;
-        
-    }
-}*/
-
 // function for displaying all videos and best seller
 void VideoADT::displayAllVideos() {
 	int bestSeller, copies;
@@ -289,7 +276,8 @@ void RentADT::ReturnVideo(int customerID, int videoID, VideoADT& videoADT) {
         } else {
             cout << "Customer not found!\n";
         }
-    }
+}
+    
 // function for rented videos of a customer
 void RentADT::printRentedVideos(int customerID, const queue<Customer>& customers) {
 	bool customerExists = false;
