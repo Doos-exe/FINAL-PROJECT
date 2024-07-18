@@ -69,7 +69,7 @@ class RentADT{
 		void saveNewRentalToFile(int customerID, int videoID);
 		void saveCustomerRentalToFile();
 		void loadRentalsFromFile();
-		char again();
+		char again(int opta);
 		
 		const map<int, Rent> getCustomerRentals()const{
 			return customerRentals;
