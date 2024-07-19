@@ -167,7 +167,7 @@ int main(){
 		
 		// Loop for the option to run it again
 		do{
-			cout << endl << "Do you want to go back to the Main Menu: ";
+			cout << endl << "Do you want to go back to the Main Menu (Y/N): ";
 			cin >> opt;
 			
 			switch(opt){
