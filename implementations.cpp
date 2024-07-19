@@ -408,12 +408,12 @@ char RentADT::again(int opta){
 	char opt;
 	do{
 		if (opta == 2){
-			cout<<endl<<"Do you want to rent another video? ";
+			cout<<endl<<"Do you want to rent another video (Y/N)? ";
 			cin>>opt;
 		}
 		
 		if (opta == 3){
-			cout<<endl<<"Do you want to return another video? ";
+			cout<<endl<<"Do you want to return another video (Y/N)? ";
 			cin>>opt;
 		}
 			
